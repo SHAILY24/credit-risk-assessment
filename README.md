@@ -22,7 +22,7 @@ Developed a cutting-edge machine learning model using ensemble techniques and de
 9. [Dependencies](#dependencies)
 10. [References](#references)
 11. [Acknowledgments](#acknowledgments)
-12. [ELI5: Explain Like I'm Five](#eli5-explain-like-im-five)
+12. [Simplified Explanation for Non-Technical Audiences](#simplified-explanation-for-non-technical-audiences)
 
 ---
 
