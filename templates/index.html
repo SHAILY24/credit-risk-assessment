@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Advanced Credit Risk Assessment Model | {{ data['author'] }}</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- MathJax for LaTeX support -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Highlight.js for syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightElement(block);
+            });
+        });
+    </script>
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+
+    <header>
+        <h1>Advanced Credit Risk Assessment Model</h1>
+        <p>By {{ data['author'] }}</p>
+    </header>
+
+    <nav>
+        <a href="#motivation">Motivation</a>
+        <a href="#development">Development</a>
+        <a href="#results">Results</a>
+        <a href="#conclusion">Conclusion</a>
+        <a href="#github">GitHub</a>
+        <a href="#contact">Contact</a>
+    </nav>
+
+    <main>
+
+        <h2 id="motivation">Motivation</h2>
+        <p>
+            Accurately assessing credit risk is essential for financial institutions. Traditional methods may lack predictive accuracy and transparency. This project leverages advanced machine learning and explainable AI to enhance credit risk assessment models.
+        </p>
+        <p>
+            By combining ensemble models and deep learning with explainable AI techniques, we aim to build a model that is both highly accurate and interpretable, addressing regulatory requirements and fostering stakeholder trust.
+        </p>
+
+        <h2 id="development">Development Process</h2>
+
+        <h3>Data Preprocessing</h3>
+        <p>
+            The project utilizes the <a href="https://archive.ics.uci.edu/ml/datasets/Statlog+%28German+Credit+Data%29" target="_blank">German Credit Data</a> from the UCI Machine Learning Repository. Key preprocessing steps included:
+        </p>
+        <ul>
+            <li>Handling missing values</li>
+            <li>Encoding categorical variables using one-hot encoding</li>
+            <li>Scaling numerical features with <code>StandardScaler</code></li>
+            <li>Addressing class imbalance using Synthetic Minority Over-sampling Technique (SMOTE)</li>
+        </ul>
+
+        <h4>Sample Data Preprocessing Code</h4>
+        <pre><code class="language-python">
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from imblearn.over_sampling import SMOTE
+
+# One-hot encode categorical variables
+encoder = OneHotEncoder(sparse_output=False)
+X_encoded = encoder.fit_transform(X_categorical)
+
+# Scale numerical features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X_numerical)
+
+# Combine encoded and scaled features
+X_preprocessed = np.hstack((X_encoded, X_scaled))
+
+# Address class imbalance
+smote = SMOTE(random_state=42)
+X_resampled, y_resampled = smote.fit_resample(X_preprocessed, y)
+        </code></pre>
+
+        <h3>Model Development</h3>
+        <p>
+            Three models were developed and optimized:
+        </p>
+        <ul>
+            <li><strong>Random Forest Classifier</strong></li>
+            <li><strong>Gradient Boosting Classifier</strong></li>
+            <li><strong>Neural Network</strong></li>
+        </ul>
+        <p>
+            Hyperparameter tuning was performed using grid search and cross-validation.
+        </p>
+
+        <h4>Sample Model Training Code</h4>
+        <pre><code class="language-python">
+from sklearn.model_selection import GridSearchCV
+from sklearn.ensemble import RandomForestClassifier
+
+# Define parameter grid
+param_grid = {
+    'n_estimators': [100, 200],
+    'max_depth': [5, 10, None],
+    'min_samples_split': [2, 5],
+}
+
+# Initialize Random Forest Classifier
+rf = RandomForestClassifier(random_state=42)
+
+# Perform Grid Search
+grid_search = GridSearchCV(estimator=rf, param_grid=param_grid, cv=5)
+grid_search.fit(X_resampled, y_resampled)
+
+# Best Model
+best_rf = grid_search.best_estimator_
+        </code></pre>
+
+        <h3>Evaluation Metrics</h3>
+        <p>
+            The models were evaluated using accuracy, precision, recall, and F1 score. The F1 score is calculated as:
+        </p>
+        <p style="text-align: center;">
+            $$ F1\ Score = 2 \times \left( \frac{Precision \times Recall}{Precision + Recall} \right) $$
+        </p>
+        <p>
+            Where:
+        </p>
+        <ul>
+            <li><strong>Precision</strong>: Proportion of true positives among all positive predictions.</li>
+            <li><strong>Recall</strong>: Proportion of true positives among all actual positives.</li>
+        </ul>
+
+        <h2 id="results">Results</h2>
+        <h3>Model Performance</h3>
+        <p>The models achieved the following performance metrics:</p>
+        <table>
+            <tr>
+                <th>Model</th>
+                <th>Accuracy</th>
+                <th>Precision</th>
+                <th>Recall</th>
+                <th>F1 Score</th>
+            </tr>
+            {% for i in range(data['metrics'].shape[0]) %}
+            <tr>
+                <td>{{ data['metrics']['Model'][i] }}</td>
+                <td>{{ (data['metrics']['Accuracy'][i]*100)|round(2) }}%</td>
+                <td>{{ (data['metrics']['Precision'][i]*100)|round(2) }}%</td>
+                <td>{{ (data['metrics']['Recall'][i]*100)|round(2) }}%</td>
+                <td>{{ (data['metrics']['F1 Score'][i]*100)|round(2) }}%</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <h3>SHAP Summary Plots</h3>
+        <p>
+            SHAP (SHapley Additive exPlanations) values were used to explain model predictions, highlighting the contribution of each feature.
+        </p>
+
+        <h4>Random Forest SHAP Summary Plot</h4>
+        <img src="{{ url_for('static', filename='output/rf_shap.png') }}" alt="Random Forest SHAP Plot">
+
+        <h4>Gradient Boosting SHAP Summary Plot</h4>
+        <img src="{{ url_for('static', filename='output/gb_shap.png') }}" alt="Gradient Boosting SHAP Plot">
+
+        <h4>Neural Network SHAP Summary Plot</h4>
+        <img src="{{ url_for('static', filename='output/nn_shap.png') }}" alt="Neural Network SHAP Plot">
+
+        <p>
+            The SHAP plots consistently show that features like <em>Credit History</em>, <em>Age</em>, and <em>Credit Amount</em> are significant determinants in assessing credit risk.
+        </p>
+
+        <h2 id="conclusion">Conclusion</h2>
+        <p>
+            The project achieved a significant improvement in credit risk prediction accuracy. By integrating explainable AI techniques, the models provide transparency and interpretability, aligning with regulatory requirements and enhancing stakeholder trust.
+        </p>
+        <p>
+            This approach underscores the importance of combining advanced machine learning models with explainability tools in critical financial applications.
+        </p>
+
+        <h2 id="github">GitHub Repository</h2>
+        <p>
+            You can access the full codebase and explore further details on GitHub:
+        </p>
+        <p>
+            <a href="https://github.com/SHAILY24/credit-risk-assessment" target="_blank">
+                <i class="fab fa-github"></i> github.com/SHAILY24/credit-risk-assessment
+            </a>
+        </p>
+        <p>
+            Feel free to clone the repository and experiment with the code:
+        </p>
+        <pre><code class="language-bash">
+# Clone the repository
+git clone https://github.com/SHAILY24/credit-risk-assessment.git
+
+# Navigate to the project directory
+cd credit-risk-assessment
+
+# Create a virtual environment (optional but recommended)
+python -m venv venv
+source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Copy the .env.example file to .env and set the appropriate values
+cp .env.example .env
+
+# Generate results and run the app
+python generate_results.py
+python app.py
+        </code></pre>
+
+        <h2 id="contact">Contact Information</h2>
+        <p>
+            If you have any questions or would like to discuss this project further, please feel free to reach out:
+        </p>
+        <p>
+            <strong>Email</strong>: <a href="mailto:{{ data['email'] }}">{{ data['email'] }}</a>
+        </p>
+        <p>
+            <strong>LinkedIn</strong>: <a href="{{ data['linkedin'] }}" target="_blank">{{ data['author'] }}</a>
+        </p>
+
+    </main>
+
+    <footer>
+        <p>© <script>document.write(new Date().getFullYear())</script> {{ data['author'] }}. All rights reserved.</p>
+    </footer>
+
+</body>
+
+</html>

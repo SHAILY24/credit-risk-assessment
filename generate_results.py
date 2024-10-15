@@ -1,79 +1,75 @@
+import pickle
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-from data_preprocessing import load_data, preprocess_data
-from models import (
+from src.data_preprocessing import load_data, preprocess_data
+from src.models import (
     train_random_forest, train_gradient_boosting, train_neural_network
 )
-from evaluation import (
-    evaluate_model, evaluate_neural_network, display_metrics
+from src.evaluation import (
+    evaluate_model, evaluate_neural_network
 )
-from explainable_ai import explain_tree_model, explain_deep_model
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import (
-    accuracy_score, precision_score, recall_score, f1_score, classification_report
-)
+from src.explainable_ai import explain_tree_model, explain_deep_model
 import numpy as np
-
 
 def main():
     # Load and preprocess the data
     df = load_data()
     X_train, X_test, y_train, y_test = preprocess_data(df)
-    
+
     # Train Random Forest model
     rf_model = train_random_forest(X_train, y_train)
     rf_pred, rf_report = evaluate_model(rf_model, X_test, y_test)
-    print("Random Forest Classification Report:\n", rf_report)
-    
+    rf_accuracy = rf_model.score(X_test, y_test)
+
     # Train Gradient Boosting model
     gb_model = train_gradient_boosting(X_train, y_train)
     gb_pred, gb_report = evaluate_model(gb_model, X_test, y_test)
-    print("Gradient Boosting Classification Report:\n", gb_report)
-    
+    gb_accuracy = gb_model.score(X_test, y_test)
+
     # Train Neural Network model
     nn_model, scaler = train_neural_network(X_train, y_train)
     X_test_scaled = scaler.transform(X_test)
     nn_pred, nn_report = evaluate_neural_network(nn_model, X_test_scaled, y_test)
-    print("Neural Network Classification Report:\n", nn_report)
-    
+    nn_accuracy = nn_model.evaluate(X_test_scaled, y_test, verbose=0)[1]
+
     # Compile metrics
     metrics = {
         'Model': ['Random Forest', 'Gradient Boosting', 'Neural Network'],
-        'Accuracy': [
-            rf_model.score(X_test, y_test),
-            gb_model.score(X_test, y_test),
-            nn_model.evaluate(X_test_scaled, y_test, verbose=0)[1]
-        ],
+        'Accuracy': [rf_accuracy, gb_accuracy, nn_accuracy],
         'Precision': [
-            precision_score(y_test, rf_pred),
-            precision_score(y_test, gb_pred),
-            precision_score(y_test, nn_pred)
+            rf_report['1']['precision'],
+            gb_report['1']['precision'],
+            nn_report['1']['precision']
         ],
         'Recall': [
-            recall_score(y_test, rf_pred),
-            recall_score(y_test, gb_pred),
-            recall_score(y_test, nn_pred)
+            rf_report['1']['recall'],
+            gb_report['1']['recall'],
+            nn_report['1']['recall']
         ],
         'F1 Score': [
-            f1_score(y_test, rf_pred),
-            f1_score(y_test, gb_pred),
-            f1_score(y_test, nn_pred)
+            rf_report['1']['f1-score'],
+            gb_report['1']['f1-score'],
+            nn_report['1']['f1-score']
         ]
     }
-    display_metrics(metrics)
-    output_dir = os.path.join('output')
-    # Explain models and save plots
+
+    # Generate SHAP plots and save them to the static directory
+    output_dir = os.path.join('static', 'output')
+    os.makedirs(output_dir, exist_ok=True)
     explain_tree_model(rf_model, X_train, output_dir, filename='rf_shap.png')
     explain_tree_model(gb_model, X_train, output_dir, filename='gb_shap.png')
     explain_deep_model(nn_model, scaler.transform(X_train), X_test_scaled, output_dir, filename='nn_shap.png')
+
+    # Save the results
     results = {
         'rf_report': rf_report,
         'gb_report': gb_report,
         'nn_report': nn_report,
         'metrics': metrics
     }
-    return results
+
+    with open('saved_results.pkl', 'wb') as f:
+        pickle.dump(results, f)
 
 if __name__ == '__main__':
     main()

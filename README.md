@@ -2,6 +2,9 @@
 
 Developed a cutting-edge machine learning model using ensemble techniques and deep learning, improving credit risk prediction accuracy by 40% for a major financial institution. Implemented explainable AI techniques to provide transparent risk assessments, increasing stakeholder trust and regulatory compliance.
 
+**Live Preview**: Visit [https://cram.shaily.dev](https://cram.shaily.dev) to see the project in action.
+
+
 ## Table of Contents
 
 1. [Project Overview](#project-overview)
@@ -58,15 +61,15 @@ The project uses the **German Credit Data** dataset from the UCI Machine Learnin
 ```
 credit_risk_assessment/
 ├── data/
-│   ├── german.data
-│   ├── german.data-numeric
-│   └── german.doc
+│ ├── german.data
+│ ├── german.data-numeric
+│ └── german.doc
 ├── src/
-│   ├── data_preprocessing.py
-│   ├── models.py
-│   ├── explainable_ai.py
-│   ├── evaluation.py
-│   └── main.py
+│ ├── data_preprocessing.py
+│ ├── models.py
+│ ├── explainable_ai.py
+│ ├── evaluation.py
+│ └── main.py
 ├── requirements.txt
 └── README.md
 ```
@@ -125,7 +128,11 @@ credit_risk_assessment/
    python src/main.py
    ```
 
-3. **View Outputs**
+3. **Start the Flask Application**
+
+   ```bash
+   python app.py
+   ```
 
    - **Console Output**: Classification reports and performance metrics.
    - **Plots**: SHAP summary plots are saved in the `output/` directory.
@@ -209,6 +216,8 @@ tensorflow==2.13.0
 keras==2.13.1
 shap==0.42.1
 imbalanced-learn
+flask
+python-dotenv
 ```
 
 - **pandas**: Data manipulation and analysis.
@@ -239,10 +248,12 @@ imbalanced-learn
 ## Simplified Explanation for Non-Technical Audiences
 
 Imagine you're a bank trying to decide whether to give someone a loan. You want to make sure they can pay it back, so you look at their financial history, age, and other factors. This project uses advanced computer programs to help make these decisions more accurately.
+
 ### What We Did:
 - Data Analysis: We collected data about past borrowers, including their financial habits and whether they repaid their loans.
 - Model Training: We taught our computer programs to recognize patterns in this data, helping them predict who might have trouble repaying a loan.
 - Transparency: We used special tools to understand which factors were most important in making these predictions. This helps us explain the decisions to others, like bank managers or the borrowers themselves.
+
 ### Why It Matters:
 - Better Decisions: By using these advanced techniques, banks can make more informed decisions about who to lend money to, reducing the risk of defaults.
 - Trust and Compliance: Understanding the reasons behind each decision helps build trust with customers and ensures the bank meets regulatory requirements.
